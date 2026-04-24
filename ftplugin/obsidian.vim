@@ -98,14 +98,17 @@ if !exists('*ObsidianFollowLink')
 
         let result = {
                     \ 'file': '',
-                    \ 'heading': ''
+                    \ 'heading': '',
+                    \ 'heading_level': 0
                     \ }
 
+        let idx = stridx(target, '#')
         " Split heading
-        if target =~ '#'
-            let sub = split(target, '#', 1)
-            let result.file = sub[0]
-            let result.heading = sub[1]
+        if idx != -1
+            let result.file = target[:idx-1]
+            let rest = target[idx:]
+            let result.heading_level = len(matchstr(rest, '^#\+'))
+            let result.heading = substitute(rest, '^#\+', '', '')
         else
             let result.file = target
         endif
@@ -171,22 +174,20 @@ if !exists('*ObsidianFollowLink')
     "
     " Jumps to a markdown heading in the current buffer.
     "
-    " Matches:
-    "   # Heading
-    "   ## Heading
-    "   etc.
-    "
-    " Notes:
-    "   - Case-insensitive
-    "   - Basic matching (can be improved with normalization)
+    " Given a heading dict containing the heading text and level, constructs a
+    " search for the exact heading, i.e. /^<'#' * heading_level>\s\+<heading_text>/
     " ----------------------------------------------------------------------------
-    function! s:JumpToHeading(heading)
-        if a:heading == ''
+    function! s:JumpToHeading(parsed_heading)
+        if a:parsed_heading.heading == ''
             return
         endif
 
+        let hashes = repeat('#', a:parsed_heading.heading_level)
+
         " Escape regex characters
-        let pattern = '^#\+\s*' . escape(a:heading, '.*[]\')
+        let text = escape(a:parsed_heading.heading, '.*[]\')
+
+        let pattern = '^' .. hashes .. '\s\+' .. text
 
         " 'w' = wrap around file
         call search(pattern, 'w')
@@ -235,7 +236,7 @@ if !exists('*ObsidianFollowLink')
         endif
         execute method .. ' ' .. fnameescape(file)
 
-        call s:JumpToHeading(parsed.heading)
+        call s:JumpToHeading(parsed)
     endfunction
 
 
