@@ -162,10 +162,26 @@ if !exists('*ObsidianFollowLink')
         if len(matches) == 0
             return ''
         endif
+        
+        if len(matches) == 1
+            return matches[0]
+        endif
 
-        " If multiple matches exist, we just take the first for now.
-        " You can later plug in fzf here.
-        return matches[0]
+        " If multiple matches, ask user.
+        echohl WarningMsg
+        echo 'Ambiguous link: ' .. fname
+        echohl None
+
+        let choices = ['Multiple matches found for ' .. fname .. ':']
+
+        for [match_idx, match] in items(matches)
+            call add(choices, (match_idx + 1) .. ". " .. substitute(match, '^' .. escape(a:vault, '\'), '', ''))
+        endfor
+        let idx = inputlist(choices)
+        if idx <= 0 || idx > len(matches)
+            return ''
+        endif
+        return matches[idx - 1]
     endfunction
 
 
