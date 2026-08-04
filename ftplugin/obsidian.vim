@@ -262,10 +262,10 @@ if !exists('*ObsidianFollowLink')
     " Change this if you don't want to override gf
     " ----------------------------------------------------------------------------
 
-    nnoremap <silent> gd :call ObsidianFollowLink('edit')<CR>
-    nnoremap <silent> <leader>gd :call ObsidianFollowLink('pedit')<CR>
-    nnoremap <silent> <leader><leader>gd :call ObsidianFollowLink('vsplit')<CR>
-    nnoremap <silent> <leader><leader><leader>gd :call ObsidianFollowLink('tabedit')<CR>
+    nnoremap <buffer><silent> gd :call ObsidianFollowLink('edit')<CR>
+    nnoremap <buffer><silent> <leader>gd :call ObsidianFollowLink('pedit')<CR>
+    nnoremap <buffer><silent> <leader><leader>gd :call ObsidianFollowLink('vsplit')<CR>
+    nnoremap <buffer><silent> <leader><leader><leader>gd :call ObsidianFollowLink('tabedit')<CR>
 
     " Alternative:
     " nnoremap <leader>of :call ObsidianFollowLink()<CR>
