@@ -180,4 +180,10 @@ nnoremap <buffer><silent> <leader><leader><leader>gd :call ObsidianFollowLink('t
 " Neovim: extmark-based highlights that work above treesitter
 if has('nvim')
     lua require('obsidian.highlight').attach()
+else
+    " conceallevel/concealcursor are window-local; re-apply for splits
+    setlocal conceallevel=2 concealcursor=
+    execute 'augroup obsidian_conceal_win_' . bufnr('%')
+        autocmd! BufWinEnter <buffer> setlocal conceallevel=2 concealcursor=
+    augroup END
 endif
