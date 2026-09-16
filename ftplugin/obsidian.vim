@@ -282,40 +282,14 @@ if !exists('*ObsidianFollowLink')
     "
     " ----------------------------------------------------------------------------
 
-    " -------------------------------------------------------------------------
-    " Wiki-link match highlights
-    "
-    " matchadd() renders above treesitter extmarks, so treesitter's incremental
-    " re-parse cannot clobber these.  All four groups must already be defined
-    " as highlight groups (done by syntax/obsidian.vim below).
-    " -------------------------------------------------------------------------
-    function! s:ObsidianSetMatches() abort
-        for m in getmatches()
-            if m.group =~# '^Obsidian'
-                return
-            endif
-        endfor
-        call matchadd('ObsidianLink',      '\[\[[^\]]*\]\]',               12)
-        call matchadd('ObsidianLinkDelim', '\[\[\|\]\]',                   11)
-        call matchadd('ObsidianLinkSep',   '\[\[[^\]]*\zs|\ze[^\]]*\]\]', 11)
-        call matchadd('ObsidianLinkAlias', '\[\[[^\]]*|\zs[^\]]*\ze\]\]', 10)
-    endfunction
-
 endif
 
 " Per-buffer setup - runs every time
 let b:obsidian_vault_root = obsidian#FindVaultRoot()
 
-" Set syntax explicitly: syntax/syntax.vim skips the automatic assignment
-" when treesitter is active (b:ts_highlight), so we force it here.
-" This loads syntax/obsidian.vim (defining highlight groups) and covers
-" users who don't have treesitter enabled.
-set syntax=markdown.obsidian
-
-" matchadd() renders above treesitter extmarks so these are never overwritten
-" by treesitter's markdown re-parse.  Re-apply for every window this buffer
-" enters (matchadd is window-local).
-augroup obsidian_matches
-    autocmd! BufWinEnter <buffer> call s:ObsidianSetMatches()
-augroup END
-call s:ObsidianSetMatches()
+" In Neovim, use extmark-based highlights (priority 200, above treesitter).
+" In plain Vim, syntax/obsidian.vim handles everything via the normal
+" filetype → syntax pipeline set up by ftdetect/obsidian.vim.
+if has('nvim')
+    lua require('obsidian.highlight').attach()
+endif
