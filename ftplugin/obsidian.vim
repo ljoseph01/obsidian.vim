@@ -286,3 +286,10 @@ endif
 
 " Per-buffer setup - runs every time
 let b:obsidian_vault_root = obsidian#FindVaultRoot()
+
+" In Neovim, use extmark-based highlights (priority 200, above treesitter).
+" In plain Vim, syntax/obsidian.vim handles everything via the normal
+" filetype → syntax pipeline set up by ftdetect/obsidian.vim.
+if has('nvim')
+    lua require('obsidian.highlight').attach()
+endif
