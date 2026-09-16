@@ -286,3 +286,7 @@ endif
 
 " Per-buffer setup - runs every time
 let b:obsidian_vault_root = obsidian#FindVaultRoot()
+
+" syntax/syntax.vim skips `set syntax=` when treesitter is active (b:ts_highlight).
+" Set it explicitly so syntax/obsidian.vim loads regardless.
+set syntax=markdown.obsidian
