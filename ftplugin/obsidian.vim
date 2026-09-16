@@ -257,24 +257,8 @@ if !exists('*ObsidianFollowLink')
 
 
     " ----------------------------------------------------------------------------
-    " MAPPINGS
-    "
-    " Change this if you don't want to override gf
-    " ----------------------------------------------------------------------------
-
-    nnoremap <buffer><silent> gd :call ObsidianFollowLink('edit')<CR>
-    nnoremap <buffer><silent> <leader>gd :call ObsidianFollowLink('pedit')<CR>
-    nnoremap <buffer><silent> <leader><leader>gd :call ObsidianFollowLink('vsplit')<CR>
-    nnoremap <buffer><silent> <leader><leader><leader>gd :call ObsidianFollowLink('tabedit')<CR>
-
-    " Alternative:
-    " nnoremap <leader>of :call ObsidianFollowLink()<CR>
-
-
-    " ----------------------------------------------------------------------------
     " FUTURE IDEAS (for when you come back later)
     "
-    " - FZF integration for multiple matches
     " - Backlinks via :grep
     " - Completion for [[...]]
     " - Cache vault file list for speed
@@ -287,9 +271,20 @@ endif
 " Per-buffer setup - runs every time
 let b:obsidian_vault_root = obsidian#FindVaultRoot()
 
-" In Neovim, use extmark-based highlights (priority 200, above treesitter).
-" In plain Vim, syntax/obsidian.vim handles everything via the normal
-" filetype → syntax pipeline set up by ftdetect/obsidian.vim.
 if has('nvim')
+    " Extmark-based highlights (priority 200, above treesitter)
     lua require('obsidian.highlight').attach()
+
+    " Lua navigation uses vim.ui.select for multi-match, so fzf-lua
+    " (or any picker that overrides vim.ui.select) is picked up automatically
+    nnoremap <buffer><silent> gd <Cmd>lua require('obsidian.navigation').follow_link('edit')<CR>
+    nnoremap <buffer><silent> <leader>gd <Cmd>lua require('obsidian.navigation').follow_link('pedit')<CR>
+    nnoremap <buffer><silent> <leader><leader>gd <Cmd>lua require('obsidian.navigation').follow_link('vsplit')<CR>
+    nnoremap <buffer><silent> <leader><leader><leader>gd <Cmd>lua require('obsidian.navigation').follow_link('tabedit')<CR>
+else
+    " Plain Vim: Vimscript navigation with inputlist fallback
+    nnoremap <buffer><silent> gd :call ObsidianFollowLink('edit')<CR>
+    nnoremap <buffer><silent> <leader>gd :call ObsidianFollowLink('pedit')<CR>
+    nnoremap <buffer><silent> <leader><leader>gd :call ObsidianFollowLink('vsplit')<CR>
+    nnoremap <buffer><silent> <leader><leader><leader>gd :call ObsidianFollowLink('tabedit')<CR>
 endif
